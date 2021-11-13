@@ -1,0 +1,12 @@
+{
+    "type": "service_account",
+    "project_id": "tasimacilik-decaf",
+    "private_key_id": "1b008306736caeed41216ee977d9b957a5a76fb1",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQD4spQaW0vEEAv2\nm40PhjhEX5mxojYi/sOhKdpemb5qG7lXg8n8Ili5BUbNlfUuSPhMW9pZtC4pMJ+p\nEe9S4s43QtzHeqKpnmVsHYCUz6Is4x9gAvJt87Pg3E5MmEG/3MmVd1b6rrT4k6fd\nP0IxagSl5BrqaWHmjDtts//0jvDHLCWY404chTjSXt+Ee+ZzHut5rSRuoGUOd7cF\nfysge71q8nQ5xyHZlmVR5cjLPa0wcVbauFbj8Px0eJ8qloIkZ5gikMmJGA31jo3l\nl4q+wluIc6rfwAFKuFu16eibUcNXP5eQ7kLM8W6Z1ClQJ+vgRFx2IoBfYhOUY5at\nDLX/Y+crAgMBAAECggEAHSDtb9jZmvE2NYAqmXLjDD8WRVP2e0rTpwC77vCa+Nqe\nbr2k3r83HRSdIl86BF3Pl0H65R7ReUmUqbzMBy1Bcf+G1GZsvukqf+tEsClRmWhQ\nuHIf6vjsTJ4BHb+Hk+1MPxFnQp1L3QGOW7+ZBSihurxo2qPVL6elHkhC5mYHlYw/\nD51zSUSeNQQZQjYhP++mlcG06Ox6jh+KHGycEs8eaJTnC7mhMT8XbtGbjivLKVoD\nD6K20Y6slvb8HPmY3yqEnPGYBvk375edd5rK/LSlc6Crh+KPsUnF1EPXffnbve+w\nRUNCTT35JXPGqLzMt5XtvOJIh6XIN+HK9CFX3oQhAQKBgQD8nvdewrtYSyNClfCP\nJmwlVZg8+gmK7atbTKjQxM3dLiGaLKJ3HTvp7RbHuvhbVpNLaiKZPgxet/1P8WtF\nFvOwAI2fCutKFmdXDLMEygXCeWpxX5+EB72Uu+w8nH4a/ITMiXoTe4ZiiPS5OczH\ndiJsL0GOLlCpP495Y0v/dz3dCwKBgQD8Bi147okxt1B7PL0eRIfeG0Rwo6JXksmu\nsyTG96dulp5wG8uF9D1gpkZSC+PkJ95uXqZVlbOV8bk9Nxxegt4aT23bGWoIjA7m\nTEcFgX0o25rttY06CBmfa9x2cLUvO0P9sMH5I8kENtyh9n2lIqx//cXzmD6ktM/A\nPgDhObUyYQKBgD8doIRmdtRKgZbDS4UYfnCdgBnMBtJVKzj2YD84zI50ViTk/fpw\nrWV2vPhN+HspmEeBTv+mhwSrR3jPwpNSdrQEj12rJrot+se+/oM1zlaWa0fEMmCU\nZoNgqFdEaiVn7e4EcyGm/R5lRW95x3YWR+drrx9M5w5COSCE9JnxOt2dAoGBAJZn\n+WtasHYDOPzTWupda9iZ3VZ70b8B02t3blNwKXROX2/4ppXjFV5A3WbJwc/AG3cy\n9YHOPccW474szbl50KNTE/TWTfmb3KiEjT4z8UYZCXUkDIy9mM0TyhbFXNw7OnCE\ntL7DJIxnUXU3bfTHpLsd8K1YBsq1Pec1GcFQd1sBAoGAJVCX1L4BHijWGgjlt4Dv\nNAUfJT9Pfe89DtwaFxHcKNFZmsUHZDyRVrVbFIXNacROuIb2rvIwsTxl1lI0YorN\nzpIXorTvdq7tbZCKz7JsHxGNW5LitjqR6I2s0u6IitSMN93cW9BEuVB7oXXvkkEi\nhl5rguLQwipTAHxZw5VkJ/4=\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-2k1ac@tasimacilik-decaf.iam.gserviceaccount.com",
+    "client_id": "103897877004765331726",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-2k1ac%40tasimacilik-decaf.iam.gserviceaccount.com"
+  }
