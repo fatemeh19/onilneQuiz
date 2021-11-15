@@ -49,6 +49,31 @@ class UniversityController {
         }
 
     }
+    static async getUniById(req, res) {
+        try {
+            const Schema = joi.object().keys({
+                id: joi.number().required(),
+            })
+            const { error, value } = Schema.validate(req.params, { abortEarly: true })
+            if (error) {
+                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید "})
+            }
+           
+            uniModel.findOne({
+                    id:value.id
+                },async (err,uni)=>{
+                    
+                    return res.send({status:"success",message:"با موفقیت انجام شد",data:uni})
+
+
+                })
+
+            
+
+        } catch (error) {
+            return response.catchError(res, error)
+        }
+    }
     
 }
 

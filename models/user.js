@@ -10,7 +10,8 @@ const mongoose = require('mongoose')
     email:   String,
     token : String,
     lastLoginAt:Date,
-    role: String
+    role: String,
+    resetPassCode:Number
   });
 
 const userModel = mongoose.model('users', userSchema)

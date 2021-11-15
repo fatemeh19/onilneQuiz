@@ -113,26 +113,40 @@ class Helper {
         return datas;
     }
     static async GenerateToken(user, type = "user") {
-        let token = jwt.sign({ _type: type }, userKey, { subject: user.id + "" /*,expiresIn: "2d"*/ })
+        let token = jwt.sign({ _type: type,subject:user.id }, userKey)
         let lastloginToken = jwt.decode(token)
         //set lastlogin to new token iat so other tokens will deactivate
         user.lastLoginAt = new Date(lastloginToken.iat * 1);
         await user.save()
         return token
     }
-    static async TokenVerify(token) {
+    static async TokenVerify(req,token) {
         try {
             let secret = userKey
             let decode = await jwt.verify(
                 token,
                 secret,
             );
+           
             if (decode._type == "user") {
-                userModel.findOne({
-                    id:decode.sub
+                
+                await userModel.findOne({
+                    id:decode.subject
                 },(err,user)=>{
-                    if (!user) throw false;
-                    else return user
+                    if (!user) {
+                        
+                        throw false;
+
+                    }
+                    else {
+                        
+                        req.user = user;
+                        
+                       
+                        
+                       
+
+                    }
 
                 })
                

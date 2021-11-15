@@ -1,4 +1,8 @@
 const { Helper } = require("../components/helper")
+const {userModel} = require('../models/user')
+const jwt = require("jsonwebtoken")
+const { userKey } = require("../config/params")
+
 
 
 class authMiddleware {
@@ -9,22 +13,52 @@ class authMiddleware {
             req.headers.authorization.split(" ")[0].toLocaleLowerCase() === "bearer"
         ) {
             try {
-                const user = await Helper.TokenVerify(req.headers.authorization.split(" ")[1])
-                if(!user){
-
-                }else{
-                    req.user = user;
-
-                }
+                let token = req.headers.authorization.split(" ")[1]
+                let secret = userKey
+            let decode = await jwt.verify(
+                token,
+                secret,
+            );
+           
+            if (decode._type == "user") {
                 
-                next()
+                await userModel.findOne({
+                    id:decode.subject
+                },(err,user)=>{
+                    if (!user) {
+                        
+                        return res.send({status:"error",message:"توکن شما باطل شده است لظفا دوباره وارد شوید "})
+
+
+                    }
+                    else {
+                        
+                        req.user = user;
+                        console.log(req.user)
+                        next()
+                       
+                        
+                       
+
+                    }
+
+                })
+               
+                
+            };
+               
+                
+                
+               
             } catch (error) {
                 req.user = undefined;
-                return response.customError(res, res.t("401", { scope: "Auth" }), 401);
+                // return response.customError(res, res.t("401", { scope: "Auth" }), 401);
             }
         } else {
             req.user = undefined;
-            return response.customError(res, res.t("401", { scope: "Auth" }), 401);
+            return res.send({status:"error",message:"توکن شما باطل شده است لظفا دوباره وارد شوید "})
+
+            // return response.customError(res, res.t("401", { scope: "Auth" }), 401);
         }
     }
  
