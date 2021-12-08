@@ -26,7 +26,7 @@ const cpUpload = upload.fields([{name:'profilePic' , maxCount: 1}])
 
 const authMiddleware = require("../../middleware/authMiddleware");
 
-const {UniversityController,UserController,CourseController} = require("../../controllers/normal")
+const {UniversityController,UserController,CourseController,ExamController} = require("../../controllers/normal")
 
 router.post('/university/create',UniversityController.Create)
 
@@ -48,5 +48,10 @@ router.delete('/user/deleteUser/:id', UserController.deleteUser)
 
 router.post('/course/create',CourseController.Create)
 router.get('/course/list',CourseController.List)
+
+
+
+
+router.post('/exam/create',ExamController.Create)
 
 module.exports = router;
