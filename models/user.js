@@ -8,10 +8,17 @@ const mongoose = require('mongoose')
     password:   String,
     username: String,
     email:   String,
+    emailVerify:Boolean,
     token : String,
     lastLoginAt:Date,
     role: String,
-    resetPassCode:Number
+    resetPassCode:Number,
+    deleted:{ type: Boolean, default: false },
+    profilePic:{
+      url: String,
+      name: String
+    }
+    
   });
 
 const userModel = mongoose.model('users', userSchema)

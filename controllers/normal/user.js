@@ -38,7 +38,8 @@ class UserController {
                 
 
                     userModel.findOne({
-                        email:value.email
+                        email:value.email,
+                        deleted:false
                     },(err,user)=>{
                         if(user){
                             return res.json({status:"error",message:"یوزر با ایمیل شما موجود می باشد"})
@@ -47,13 +48,20 @@ class UserController {
                         }
                         else{
                             userModel.findOne({
-                                username:value.username
+                                username:value.username,
+                                deleted:false
                             },async (err,user)=>{
                                 if(user){
                                     return res.json({status:"error",message:"یوزر با نام کاربری شما موجود می باشد"})
                     
                                 }else{
                                     value.password =await  Helper.Hash(value.password)
+                                    value.profilePic={
+                                        url:process.cwd()+"/public/upload/customProfile.jpeg",
+                                        name:"customProfile.jpeg"
+                                    }
+                                     
+                                    value
                                     const NewUser = new userModel(value)
                                     NewUser.save(function (err) {
                                       if (err) console.log(err)
@@ -110,7 +118,8 @@ class UserController {
 
                 userModel.find({
                     role:value.role,
-                    uniId:req.user.uniId
+                    uniId:req.user.uniId,
+                    deleted:false
                 },async (err,users)=>{
                     return res.send({status:"success",message:"با موفقیت انجام شد",data:users})
 
@@ -215,7 +224,8 @@ class UserController {
             }
            
                 userModel.findOne({
-                    id:value.id
+                    id:value.id,
+                    deleted:false
                 },async (err,user)=>{
                     
                     return res.send({status:"success",message:"با موفقیت انجام شد",data:user})
@@ -229,66 +239,277 @@ class UserController {
             return response.catchError(res, error)
         }
     }
-
-    // static async updateMyUser(req, res) {
-    //     try {
+    static async updateUser(req, res) {
+        try {
             
          
-    //         const schema = joi.object().keys({
+            const schema = joi.object().keys({
+
+                id: joi.number().required(),
+                fullName: joi.string().required(),
+                password:  joi.string(),
+                username: joi.string().required(),
+                email:   joi.string().custom(Helper.email, "email validation").required(),
+                
+                
+            })
+            const { error, value } = schema.validate(req.body, { abortEarly: true })
+            if (error) {
+                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید یا فرمت ایمیل اشتباه است"})
+            }
+            console.log(value)
+           
+           
+                
                
-    //             fullName: joi.string().required(),
-    //             lastpass: joi.string(),
-    //             newpass:  joi.string(),
-    //             username: joi.string().required(),
-    //             email:   joi.string().custom(Helper.email, "email validation").required(),
-                
-                
-    //         })
-    //         const { error, value } = schema.validate(req.body, { abortEarly: true })
-    //         if (error) {
-    //             return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید یا فرمت ایمیل  شما اشتباه است"})
-    //         }
-    //         console.log(value)
-           
-           
-                
-    //                if(value.email){
-    //                 userModel.findOne({
-    //                     email:value.email
-    //                 },(err,user)=>{
-    //                     if(user && user.id != req.user.id){
-    //                         return res.json({status:"error",message:"یوزر با ایمیل شما موجود می باشد"})
+                    userModel.findOne({
+                        email:value.email
+                    },(err,user)=>{
+                        if(user && user.id != value.id){
+                            return res.json({status:"error",message:"یوزر بااین ایمیل موجود می باشد"})
 
 
-    //                     }
+                        }else{
+                            userModel.findOne({
+                                username:value.username
+                            },async (err,user)=>{
+                                if(user && user.id != value.id){
+                                    return res.json({status:"error",message:"یوزر با این نام کاربری موجود می باشد"})
+                    
+                                }else{
+                                    userModel.findOne({
+                                        id:value.id
+                                    },async (err,userUpdate)=>{
+                                        if(userUpdate){
+                                            
+                                            value.password =await Helper.Hash(value.password)
+                                            userUpdate.fullName =value.fullName
+                                            userUpdate.email =value.email
+                                            userUpdate.password =value.password
+                                            userUpdate.username =value.username
+                                            userUpdate.save(function (err) {
+                                                if (err) console.log(err)
+                                                else{
+                                                    return res.json({status:"success",message:"کاربر با موفقیت ویرایش شد"})
+
+                                                }
+                                              })
+
+                            
+                                        }
+                        
+                        
+                                    })
+
+
+                                }
+                
+                
+                            })
+
+
+
+
+
+                        }
                        
         
         
-    //                 })
+                    })
 
-    //                }
-    //                if(value.username){
-    //                 userModel.findOne({
-    //                     username:value.username
-    //                 },async (err,user)=>{
-    //                     if(user && user.id != req.user.id){
-    //                         return res.json({status:"error",message:"یوزر با نام کاربری شما موجود می باشد"})
+                   
+                
+                    
+
+                   
+                  
+                      
+                       
+                       
+                   
+
+         
+           
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+
+    static async deleteUser(req, res) {
+        try {
             
-    //                     }
+         
+            const schema = joi.object().keys({
+
+                id: joi.number().required(), 
+                
+            })
+            const { error, value } = schema.validate(req.params, { abortEarly: true })
+            if (error) {
+                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید یا فرمت ایمیل اشتباه است"})
+            }
+            console.log(value)
+           
+           
+                
+               
+                    userModel.findOne({
+                        id:value.id,
+                        deleted:false
+                    },(err,user)=>{
+                        if(!user){
+                            return res.send({status:"error",message:" این کاربر چند لحظه پیش حذف شد"})
+
+                        }else{
+                            user.deleted = true
+
+                            user.save(function (err) {
+                                if (err) console.log(err)
+                                else{
+                                    return res.json({status:"success",message:"کاربر با موفقیت حذف شد"})
+
+                                }
+                              })
+                        }
+                        
+                       
         
         
-    //                 })
+                    })
 
-    //                }
-    //                if(value.lasspass){
-    //                    if(value.newpass){
-    //                        value
+                   
+                
+                    
+
+                   
+                  
+                      
+                       
+                       
+                   
+
+         
+           
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+
+    static async updateMyUser(req, res) {
+        try {
+            console.log(req.files)
+            
+
+            
+         
+            const schema = joi.object().keys({
+               
+                fullName: joi.string().required(),
+                lastpass: joi.string(),
+                newpass:  joi.string(),
+                username: joi.string().required(),
+                email:   joi.string().custom(Helper.email, "email validation").required(),
+                
+                
+            })
+            const { error, value } = schema.validate(req.body, { abortEarly: true })
+            if (error) {
+                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید یا فرمت ایمیل  شما اشتباه است"})
+            }
+            // console.log(value)
 
 
-    //                    }else{
 
-    //                    }
-    //                }
+
+            userModel.findOne({
+                email:value.email
+            },(err,user)=>{
+                if(user && req.user.id != user.id){
+                    return res.json({status:"error",message:"یوزر بااین ایمیل موجود می باشد"})
+
+
+                }else{
+                    console.log(1)
+                    userModel.findOne({
+                        username:value.username
+                    },async (err,user)=>{
+                        if(user && req.user.id != user.id){
+                            return res.json({status:"error",message:"یوزر با این نام کاربری موجود می باشد"})
+            
+                        }else{
+                            console.log(1)
+
+                            userModel.findOne({
+                                id:req.user.id
+                            },async (err,userUpdate)=>{
+                                if(userUpdate){
+                                    console.log(1)
+
+                                    if(value.lastpass && value.newpass){
+                                        if(await Helper.Compare(value.lastpass,userUpdate.password)){
+                                            value.password =await Helper.Hash(value.newpass)
+    
+                                        }else{
+                                            return res.json({status:"error",message:"پسورد فعلی خود را اشتباه وارد کرده اید"})
+    
+    
+                                        }
+
+                                    }else if(lastpass || newpass){
+                                        return res.json({status:"error",message:"هردو فیلد مربوط به تغییر پسورد را کامل کنید"})
+
+                                    }
+                                   
+                                   
+                                    userUpdate.fullName =value.fullName
+                                    userUpdate.email =value.email
+                                    userUpdate.password =value.password
+                                    userUpdate.username =value.username
+                                    let profilePic
+                                    if(req.files){
+                                        profilePic = {
+                                            url:process.cwd()+"/public/upload/"+req.files.profilePic[0].filename,
+                                            name:req.files.profilePic[0].filename
+
+                                        }
+                                    }
+                                    userUpdate.profilePic = profilePic
+                                    userUpdate.save(function (err) {
+                                        if (err) console.log(err)
+                                        else{
+                                            return res.json({status:"success",message:"کاربر با موفقیت ویرایش شد"})
+
+                                        }
+                                      })
+
+                    
+                                }
+                
+                
+                            })
+
+
+                        }
+        
+        
+                    })
+
+
+
+
+
+                }
+               
+
+
+            })
+           
+           
+                
+                  
+                   
                     
 
 
@@ -305,11 +526,11 @@ class UserController {
            
 
            
-    //     } catch (error) {
-    //         return res.send({status:"error",message:error})
-    //     }
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
 
-    // }
+    }
     
     
 }

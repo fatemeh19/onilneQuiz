@@ -1,6 +1,7 @@
 const joi = require('joi')
 const {userModel} = require("../../models/user")
 const { Helper } = require("../../components/helper")
+var url = require("url");
 
 
 
@@ -23,6 +24,7 @@ class AuthController {
 
             userModel.findOne({
                 username:value.username,
+                deleted:false
                
 
             },async(err,user)=>{
@@ -81,7 +83,8 @@ class AuthController {
                 value.password = await Helper.Hash(value.password)
 
                 userModel.findOne({
-                    resetPassCode:value.code
+                    resetPassCode:value.code,
+                    deleted:false
                 },(err,user)=>{
                     if(!user){
 
@@ -120,7 +123,9 @@ class AuthController {
             console.log(code)
 
             userModel.findOne({
-                email:value.email
+                email:value.email,
+                deleted:false
+
             },(err,user)=>{
                 if(!user){
                     return res.send({status:"error",message:" کاربری با این ایمیل وجود ندارد"})
@@ -133,16 +138,19 @@ class AuthController {
             var transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                    user: 'fatemehveysi1378@gmail.com',
-                    pass: 'Fv19242419'
+                    user: 'onlinequiz.kofafaye@gmail.com',
+                    pass: 'ktdqxjwqipbpluyu'
+                                      
                 }
                 });
-    
-                var mailOptions = {
-                from: 'fatemehveysi1378@gmail.com',
+                let text = "Free Web Building Tutorials!";
+                let result = text.link("http://localhost:5500/manager-panel-change-password.html");
+
+                var mailOptions = {  
+                from: 'onlinequiz.kofafaye@gmail.com',
                 to: value.email,
                 subject: "onlineQuiz Reset Pass",
-                text: 'code : '+code+'\n'+'کد بالا را پس از ورود به ادرس زیر در فیلد کد وارد نمایید'+'\n'+"address:"+"http://localhost:5500/manager-panel-change-password.html"
+                text: 'code : '+code+'\n'+'کد بالا را پس از ورود به ادرس زیر در فیلد کد وارد نمایید'+'\n'+"address:"+result
                 }
     
                 transporter.sendMail(mailOptions, function(error, info){
