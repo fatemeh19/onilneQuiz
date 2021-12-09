@@ -61,7 +61,6 @@ class UserController {
                                         name:"customProfile.jpeg"
                                     }
                                      
-                                    value
                                     const NewUser = new userModel(value)
                                     NewUser.save(function (err) {
                                       if (err) console.log(err)
