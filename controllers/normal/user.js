@@ -470,7 +470,7 @@ class UserController {
                                     if(req.files){
                                         profilePic = {
                                             url:process.cwd()+"/public/upload/"+req.files.profilePic[0].filename,
-                                            name:req.files.profilePic[0].filename
+                                            name:req.files.profilePic[0].originalname
 
                                         }
                                     }

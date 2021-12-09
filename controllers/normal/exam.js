@@ -1,5 +1,7 @@
 const joi = require('joi')
 const {examModel} = require('../../models/exam')
+const {questionModel} = require('../../models/question')
+
 // const response = require('../../middleware/responseHandler')
 // const { Helper } = require("../../components/helper")
 const persianDate = require('persian-date');
@@ -47,6 +49,63 @@ class ExamController {
                  return res.send({status:"error",message:"یکی از فیلد های ضروری را پر نکرده اید"})
 
             }
+            let exams = await examModel.find({})
+            if(exams.length==0){
+                value.id = 1
+
+            }else{
+                value.id = exams[(exams.length)-1].id + 1
+
+            }
+            if(req.files){
+                console.log(req.files)
+                let pdf={
+                    url:process.cwd()+"/public/upload/"+req.files.examPdf[0].filename,
+                    name:req.files.examPdf[0].originalname
+                    }
+                value.pdf = pdf
+ 
+
+            }
+            if(value.QtoQTimeForAnyQ && !(value.timeForAnyQuestion)){
+                if((value.numfQuestion)*(value.questionTime)>quizTime){
+                    return res.send({status:"error",message:"لطفا زمان کل آزمون را متناسب با زمان تعیین شده برای هر سوال انتخاب کنید"})
+
+
+                }else{
+                    const newExam = new examModel(value)
+                    newExam.save(function (err) {
+                    if (err) console.log(err)
+                    else{
+                        return res.send({status:"success",message:"آزمون شما با موفقیت ساخته شد"})
+
+
+                    }
+                    })
+                    
+                }
+            }
+            else if(value.floating){
+                if(value.duration>value.quizTime){
+                    return res.send({status:"error",message:"مدت زمان پاسخگویی آزمون نباید بیشتر از زمانی باشد که برای کل ازمون قرار داده شده است"})
+
+
+                }
+                else{
+                    const newExam = new examModel(value)
+                    newExam.save(function (err) {
+                    if (err) console.log(err)
+                    else{
+                        return res.send({status:"success",message:"آزمون شما با موفقیت ساخته شد",data:newExam})
+
+
+                    }
+                    })
+
+                }
+                
+
+            }
             
             // let dateSplitStart = value.start_date.split("/")
             
@@ -70,25 +129,145 @@ class ExamController {
             // updatedDayWrapper.toArray()
             // let updatedat =updatedDayWrapper.toArray()
             
-            if(value.duration>value.quizTime){
-                return res.send({status:"error",message:"مدت زمان پاسخگویی آزمون نباید بیشتر از زمانی باشد که برای کل ازمون قرار داده شده است"})
+         
 
-            }else{
+           
+            
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
 
+    }
 
-
-            const newExam = new examModel(value)
-            newExam.save(function (err) {
-              if (err) console.log(err)
-              else{
-                return res.send({status:"success",message:"آزمون شما با موفقیت ساخته شد"})
-
-
-              }
+    static async addQuestion(req, res) {
+        try {
+            const schema = joi.object().keys({
+                face: joi.string().required(),
+                examId:joi.number().required(),
+                quesoptions:joi.array().items(joi.string()),
+                answoptions:joi.array().items(joi.string()), 
+                ResponseTime:joi.number(),
+                Score: joi.number().required(),
+                desc:joi.string()
+               
             })
-
+            const { error, value } = schema.validate(req.body, { abortEarly: true })
+            if (error) {
+                 return res.send({status:"error",message:"یکی از فیلد های ضروری را پر نکرده اید"})
 
             }
+            let ques={}
+            let answer={}
+            examModel.findOne({
+                id:value.examId
+            },(error,exam)=>{
+                if(!exam){
+                    return res.send({status:"error",message:"آزمون مد نظر شما موجود نیست"})
+
+                }else{
+                    questionModel.find({
+                        examId:exam.id
+                    },async(error,questions)=>{
+                        if((questions.length)+1>exam.numfQuestion){
+                            return res.send({status:"error",message:"از حدی که تعیین کردید نمی توانید بیشتر سوال طرح کنید"})
+
+
+                        }else{
+                            if(exam.QtoQTimeForAnyQ){
+                                if(!exam.timeForAnyQuestion){
+                                    value.ResponseTime = exam.questionTime
+        
+                                }
+                            }
+                            if(req.files.questionPic){
+                               
+                               let quesPic={
+                                    url:process.cwd()+"/public/upload/"+req.files.questionPic[0].filename,
+                                    name:req.files.questionPic[0].originalname
+                                  }
+                                  ques = {
+                                    quesPic
+                                  
+                                }
+                                //   ques.quesPic = quesPic
+                                  value.ques = ques
+                               
+
+                            }else{
+                                let face =value.face
+                                ques = {
+                                    face
+                                  
+                                }
+
+                            }
+                            if(req.files.answerPic){
+                                let answPic={
+                                    url:process.cwd()+"/public/upload/"+req.files.answerPic[0].filename,
+                                    name:req.files.answerPic[0].originalname
+                                  }
+                                  answer = {
+                                    answPic
+                                  
+                                }
+                                  answer.answPic = answPic
+                               
+
+                            }
+                            if(value.quesoptions){
+                                ques.options = value.quesoptions
+                                answer.options = value.answoptions
+
+
+                            }
+                            value.ques = ques
+                            value.answer = answer
+
+                            let questions = await questionModel.find({})
+                            if(questions.length==0){
+                                value.id = 1
+                
+                            }else{
+                                value.id = questions[(questions.length)-1].id + 1
+                
+                            }
+
+                            const newQuestion = new questionModel(value)
+                                newQuestion.save(function (err) {
+                                      if (err) console.log(err)
+
+                                      else{
+                                        return res.send({status:"success",message:"با موفقیت ایجاد شد",data:newQuestion})
+
+                                      }
+                                    })
+                        
+                        
+                                   
+                        
+
+
+                           
+
+                           
+
+
+
+                        }
+                    })
+                    
+                   
+                }
+               
+
+            
+
+            })
+            
+
+            
+            
+            
 
            
             

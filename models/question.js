@@ -4,14 +4,12 @@ const mongoose = require('mongoose')
   const questionSchema = new Schema({
     id:Number,
     examId:Number,
-    type:String,
-    numberOfQues:Number,
     ques:{
+      face:String,
       quesPic:{
         url:String,
         name:String
       },
-      quesText:String,
       options:[String]
     },
     answer:{
@@ -19,7 +17,6 @@ const mongoose = require('mongoose')
         url:String,
         name:String
       },
-      answText:String,
       options:[String]
 
     },

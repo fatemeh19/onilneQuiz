@@ -22,7 +22,7 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage })
 
-const cpUpload = upload.fields([{name:'profilePic' , maxCount: 1}])
+const cpUpload = upload.fields([{name:'profilePic' , maxCount: 1},{name:'examPdf' , maxCount: 1},{name:'questionPic' , maxCount: 1},{name:'answerPic' , maxCount: 1}])
 
 const authMiddleware = require("../../middleware/authMiddleware");
 
@@ -52,6 +52,10 @@ router.get('/course/list',CourseController.List)
 
 
 
-router.post('/exam/create',ExamController.Create)
+router.post('/exam/create',cpUpload,ExamController.Create)
+
+
+router.post('/question/create',cpUpload,ExamController.addQuestion)
+
 
 module.exports = router;
