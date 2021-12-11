@@ -67,45 +67,54 @@ class ExamController {
  
 
             }
-            if(value.QtoQTimeForAnyQ && !(value.timeForAnyQuestion)){
-                if((value.numfQuestion)*(value.questionTime)>quizTime){
-                    return res.send({status:"error",message:"لطفا زمان کل آزمون را متناسب با زمان تعیین شده برای هر سوال انتخاب کنید"})
+            const newExam = new examModel(value)
+            newExam.save(function (err) {
+            if (err) console.log(err)
+            else{
+                return res.send({status:"success",message:"آزمون شما با موفقیت ساخته شد",data:newExam})
 
 
-                }else{
-                    const newExam = new examModel(value)
-                    newExam.save(function (err) {
-                    if (err) console.log(err)
-                    else{
-                        return res.send({status:"success",message:"آزمون شما با موفقیت ساخته شد"})
-
-
-                    }
-                    })
-                    
-                }
             }
-            else if(value.floating){
-                if(value.duration>value.quizTime){
-                    return res.send({status:"error",message:"مدت زمان پاسخگویی آزمون نباید بیشتر از زمانی باشد که برای کل ازمون قرار داده شده است"})
+            })
+            // if(value.QtoQTimeForAnyQ && !(value.timeForAnyQuestion)){
+            //     if((value.numfQuestion)*(value.questionTime)>quizTime){
+            //         return res.send({status:"error",message:"لطفا زمان کل آزمون را متناسب با زمان تعیین شده برای هر سوال انتخاب کنید"})
 
 
-                }
-                else{
-                    const newExam = new examModel(value)
-                    newExam.save(function (err) {
-                    if (err) console.log(err)
-                    else{
-                        return res.send({status:"success",message:"آزمون شما با موفقیت ساخته شد",data:newExam})
+            //     }else{
+            //         const newExam = new examModel(value)
+            //         newExam.save(function (err) {
+            //         if (err) console.log(err)
+            //         else{
+            //             return res.send({status:"success",message:"آزمون شما با موفقیت ساخته شد"})
 
 
-                    }
-                    })
+            //         }
+            //         })
+                    
+            //     }
+            // }
+            // else if(value.floating){
+            //     if(value.duration>value.quizTime){
+            //         return res.send({status:"error",message:"مدت زمان پاسخگویی آزمون نباید بیشتر از زمانی باشد که برای کل ازمون قرار داده شده است"})
 
-                }
+
+            //     }
+            //     else{
+            //         const newExam = new examModel(value)
+            //         newExam.save(function (err) {
+            //         if (err) console.log(err)
+            //         else{
+            //             return res.send({status:"success",message:"آزمون شما با موفقیت ساخته شد",data:newExam})
+
+
+            //         }
+            //         })
+
+            //     }
                 
 
-            }
+            // }
             
             // let dateSplitStart = value.start_date.split("/")
             
