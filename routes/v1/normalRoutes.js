@@ -48,6 +48,8 @@ router.delete('/user/deleteUser/:id', UserController.deleteUser)
 
 router.post('/course/create',CourseController.Create)
 router.get('/course/list',CourseController.List)
+router.get('/course/ListOfProffCourses',CourseController.ListOfProffCourses)
+
 
 
 

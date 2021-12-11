@@ -88,6 +88,25 @@ class CourseController {
         }
     }
 
+    static async ListOfProffCourses(req, res) {
+        try {
+           
+                courseModel.find({
+                    profId:req.user.id
+                },async (err,courses)=>{
+                    
+                    return res.send({status:"success",message:"با موفقیت انجام شد",data:courses})
+
+
+                })
+
+            
+
+        } catch (error) {
+            return response.catchError(res, error)
+        }
+    }
+
    
 }
 
