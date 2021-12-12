@@ -1,5 +1,7 @@
 const joi = require('joi')
 const {userModel} = require('../../models/user')
+const {courseModel} = require('../../models/course')
+
 const {uniModel} = require('../../models/university')
 const {userType} = require('../../components/Enums')
 // const response = require('../../../middleware/responseHandler')
@@ -206,8 +208,16 @@ class UserController {
         try {
 
             let user = req.user
+            uniModel.findOne({
+                id:user.uniId
+            },(err,uni)=>{
+                
+                console.log(uni)
+                return res.send({status:"success",message:"با موفقیت انجام شد",data:user,uni:uni.name})
+
+            })
+
             
-            return res.send({status:"success",message:"با موفقیت انجام شد",data:user})
         } catch (error) {
             return response.catchError(res, error)
         }
@@ -474,8 +484,9 @@ class UserController {
                                             name:req.files.profilePic[0].originalname
 
                                         }
+                                        userUpdate.profilePic = profilePic
                                     }
-                                    userUpdate.profilePic = profilePic
+                                   
                                     userUpdate.save(function (err) {
                                         if (err) console.log(err)
                                         else{
