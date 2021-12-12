@@ -467,7 +467,7 @@ class UserController {
     
                                         }
 
-                                    }else if(lastpass || newpass){
+                                    }else if(value.lastpass || value.newpass){
                                         return res.json({status:"error",message:"هردو فیلد مربوط به تغییر پسورد را کامل کنید"})
 
                                     }

@@ -218,7 +218,7 @@ class ExamController {
         
                                 }
                             }
-                            if(req.files.questionPic){
+                            if(req.files){
                                
                                let quesPic={
                                     url:process.cwd()+"/public/upload/"+req.files.questionPic[0].filename,
@@ -240,7 +240,7 @@ class ExamController {
                                 }
 
                             }
-                            if(req.files.answerPic){
+                            if(req.files){
                                 let answPic={
                                     url:process.cwd()+"/public/upload/"+req.files.answerPic[0].filename,
                                     name:req.files.answerPic[0].originalname
