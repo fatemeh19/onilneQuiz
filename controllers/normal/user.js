@@ -449,6 +449,7 @@ class UserController {
                                     if(value.lastpass && value.newpass){
                                         if(await Helper.Compare(value.lastpass,userUpdate.password)){
                                             value.password =await Helper.Hash(value.newpass)
+                                            userUpdate.password = value.password
     
                                         }else{
                                             return res.json({status:"error",message:"پسورد فعلی خود را اشتباه وارد کرده اید"})
@@ -464,7 +465,7 @@ class UserController {
                                    
                                     userUpdate.fullName =value.fullName
                                     userUpdate.email =value.email
-                                    userUpdate.password =value.password
+                                    // userUpdate.password =value.password
                                     userUpdate.username =value.username
                                     let profilePic
                                     if(req.files){
