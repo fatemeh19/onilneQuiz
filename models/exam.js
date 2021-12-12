@@ -31,9 +31,20 @@ const mongoose = require('mongoose')
     arrange_Q:Boolean,
     backtoQuestion:Boolean,
     quizTime:Number,
-    pdf:{
+    quesPdf:{
       url:String,
-      name:String
+      name:String,
+      subjectQ:String,
+      showMinQ:Number,
+      explainationQ:String
+    },
+    answPdf:{
+      url:String,
+      name:String,
+      subjectA:String,
+      accessDateA:String,
+      accessTimeA:String,
+      explainationA:String
     }
 
   });

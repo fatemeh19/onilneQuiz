@@ -17,11 +17,11 @@ const mongoose = require('mongoose')
         url:String,
         name:String
       },
-      options:[String]
+      options:String
 
     },
-    ResponseTime:Date,
-    Score: String,
+    ResponseTime:Number,
+    Score: Number,
     desc:String
 
   });

@@ -33,15 +33,21 @@ class ExamController {
                 QtoQTimeForAnyQ:joi.boolean().required(),
                 QtoQFullTime:joi.boolean().required(),
                 //
-                numOfEnter:joi.number().required(),
+                numOfEnter:joi.number(),
                 stopTimer:joi.boolean().required(), // 0 no stop,1 stop
-                duration:joi.number().required(),
-                questionTime:joi.number().required(),
+                duration:joi.number(),
+                questionTime:joi.number(),
                 timeForAnyQuestion:joi.boolean().required(),
                 arrange_Q:joi.boolean().required(),
                 backtoQuestion:joi.boolean().required(),
-                quizTime:joi.number().required()
-                
+                quizTime:joi.number(),
+                subjectQ:joi.string(),
+                showMinQ:joi.number(),
+                explainationQ:joi.string(),
+                subjectA:joi.string(),
+                accessDateA:joi.string(),
+                accessTimeA:joi.string(),
+                explainationA:joi.string(),
                 
             })
             const { error, value } = schema.validate(req.body, { abortEarly: true })
@@ -58,15 +64,38 @@ class ExamController {
 
             }
             if(req.files){
-                console.log(req.files)
-                let pdf={
-                    url:process.cwd()+"/public/upload/"+req.files.examPdf[0].filename,
-                    name:req.files.examPdf[0].originalname
-                    }
-                value.pdf = pdf
+                if(req.files.questionPdf){
+                    let quesPdf={
+                        url:process.cwd()+"/public/upload/"+req.files.questionPdf[0].filename,
+                        name:req.files.questionPdf[0].originalname,
+                        subjectQ:value.subjectQ,
+                        showMinQ:value.showMinQ,
+                        explainationQ:value.explainationQ
+                        }
+
+
+                        value.quesPdf = quesPdf
+
+                }
+
+                if(req.files.answerPdf){
+                    let answPdf={
+                        url:process.cwd()+"/public/upload/"+req.files.answerPdf[0].filename,
+                        name:req.files.answerPdf[0].originalname,
+                        subjectA:value.subjectA,
+                        accessDateA:value.accessDateA,
+                        accessTimeA:value.accessTimeA,
+                        explainationA:value.explainationA,
+                        }
+
+                        value.answPdf = answPdf
+
+                }
+               
  
 
             }
+            value.profId = req.user.id
             const newExam = new examModel(value)
             newExam.save(function (err) {
             if (err) console.log(err)
@@ -151,10 +180,10 @@ class ExamController {
     static async addQuestion(req, res) {
         try {
             const schema = joi.object().keys({
-                face: joi.string().required(),
+                face: joi.string(),
                 examId:joi.number().required(),
                 quesoptions:joi.array().items(joi.string()),
-                answoptions:joi.array().items(joi.string()), 
+                answoptions:joi.string(), 
                 ResponseTime:joi.number(),
                 Score: joi.number().required(),
                 desc:joi.string()
@@ -165,6 +194,7 @@ class ExamController {
                  return res.send({status:"error",message:"یکی از فیلد های ضروری را پر نکرده اید"})
 
             }
+            console.log(value)
             let ques={}
             let answer={}
             examModel.findOne({
@@ -251,16 +281,6 @@ class ExamController {
                                       }
                                     })
                         
-                        
-                                   
-                        
-
-
-                           
-
-                           
-
-
 
                         }
                     })
@@ -278,6 +298,28 @@ class ExamController {
             
             
 
+           
+            
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+
+    static async List(req, res) {
+        try {
+
+            examModel.findOne({
+                profId:req.user.id
+
+            },(err,exams)=>{
+                return res.send({status:"success",message:"با موفقیت انجام شد",data:exams})
+
+                
+            })
+            
+            
+           
            
             
         } catch (error) {
