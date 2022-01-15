@@ -1,6 +1,8 @@
 const joi = require('joi')
 const {examModel} = require('../../models/exam')
 const {questionModel} = require('../../models/question')
+const {courseModel} = require('../../models/course')
+
 
 // const response = require('../../middleware/responseHandler')
 // const { Helper } = require("../../components/helper")
