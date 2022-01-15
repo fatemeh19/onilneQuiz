@@ -55,7 +55,9 @@ router.get('/course/ListOfProffCourses',CourseController.ListOfProffCourses)
 
 
 router.post('/exam/create',cpUpload,ExamController.Create)
-router.get('/exam/list',ExamController.List)
+router.get('/exam/listForProf',ExamController.List)
+router.get('/exam/listForStu',ExamController.studentElist)
+
 
 
 router.post('/question/create',cpUpload,ExamController.addQuestion)
