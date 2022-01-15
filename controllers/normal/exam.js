@@ -309,7 +309,7 @@ class ExamController {
     static async List(req, res) {
         try {
 
-            examModel.findOne({
+            examModel.find({
                 profId:req.user.id
 
             },(err,exams)=>{
@@ -328,7 +328,48 @@ class ExamController {
 
     }
 
+    static async studentElist(req, res) {
+        try {
+            
+            let list = []
+            examModel.find({},(err,exams)=>{
+                courseModel.find({
+                    uniId:req.user.uniId
+                },async (err,courses)=>{
+                    for (let i = 0; i < exams.length; i++) {
+                        for (let j = 0; j < courses.length; j++) {
+                            if(exams[i].courseId==courses[j].id){
+                                list.push(exams[i])
+                            }
+                           
+                            
+                        }
+                        
+                    }
+                    return res.send({status:"success",message:"با موفقیت انجام شد",data:list})
 
+                    
+
+
+                })
+
+              
+             
+
+                
+            })
+            
+            
+           
+           
+            
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+
+    
 
     
 
