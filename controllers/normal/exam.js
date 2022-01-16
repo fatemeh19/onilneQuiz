@@ -2,6 +2,7 @@ const joi = require('joi')
 const {examModel} = require('../../models/exam')
 const {questionModel} = require('../../models/question')
 const {courseModel} = require('../../models/course')
+const {examSheetModel} = require('../../models/examSheet')
 
 
 // const response = require('../../middleware/responseHandler')
@@ -19,38 +20,18 @@ class ExamController {
                 numfQuestion: joi.number().required(),
                 courseId:joi.number().required(),
                 title:joi.string().required(),
-                Archive:joi.boolean().required(),   
                 testordesc:joi.boolean().required(), //0 test , 1 desc
                 questionType:joi.boolean().required(), //0 with prof , 1 pdf
-                mines:joi.boolean().required(), //0 no,1 yes
                 review:joi.boolean().required(),
                 start_date:joi.string().required(),
                 start_time:joi.string().required(),
                 end_date:joi.string().required(),
                 end_time:joi.string().required(),
-            
-                //
-                currentDateAndTime:joi.boolean().required(),
-                floating:joi.boolean().required(),
-                QtoQTimeForAnyQ:joi.boolean().required(),
-                QtoQFullTime:joi.boolean().required(),
-                //
                 numOfEnter:joi.number(),
-                stopTimer:joi.boolean().required(), // 0 no stop,1 stop
-                duration:joi.number(),
-                questionTime:joi.number(),
-                timeForAnyQuestion:joi.boolean().required(),
                 arrange_Q:joi.boolean().required(),
                 backtoQuestion:joi.boolean().required(),
                 quizTime:joi.number(),
-                subjectQ:joi.string(),
-                showMinQ:joi.number(),
-                explainationQ:joi.string(),
-                subjectA:joi.string(),
-                accessDateA:joi.string(),
-                accessTimeA:joi.string(),
-                explainationA:joi.string(),
-                
+              
             })
             const { error, value } = schema.validate(req.body, { abortEarly: true })
             if (error) {
@@ -65,38 +46,7 @@ class ExamController {
                 value.id = exams[(exams.length)-1].id + 1
 
             }
-            if(req.files){
-                if(req.files.questionPdf){
-                    let quesPdf={
-                        url:process.cwd()+"/public/upload/"+req.files.questionPdf[0].filename,
-                        name:req.files.questionPdf[0].originalname,
-                        subjectQ:value.subjectQ,
-                        showMinQ:value.showMinQ,
-                        explainationQ:value.explainationQ
-                        }
-
-
-                        value.quesPdf = quesPdf
-
-                }
-
-                if(req.files.answerPdf){
-                    let answPdf={
-                        url:process.cwd()+"/public/upload/"+req.files.answerPdf[0].filename,
-                        name:req.files.answerPdf[0].originalname,
-                        subjectA:value.subjectA,
-                        accessDateA:value.accessDateA,
-                        accessTimeA:value.accessTimeA,
-                        explainationA:value.explainationA,
-                        }
-
-                        value.answPdf = answPdf
-
-                }
-               
- 
-
-            }
+          
             value.profId = req.user.id
             const newExam = new examModel(value)
             newExam.save(function (err) {
@@ -183,12 +133,12 @@ class ExamController {
         try {
             const schema = joi.object().keys({
                 face: joi.string(),
+                desc:joi.string(),
                 examId:joi.number().required(),
-                quesoptions:joi.array().items(joi.string()),
+                quesoptions:joi.string(),
                 answoptions:joi.string(), 
-                ResponseTime:joi.number(),
                 Score: joi.number().required(),
-                desc:joi.string()
+              
                
             })
             const { error, value } = schema.validate(req.body, { abortEarly: true })
@@ -214,12 +164,7 @@ class ExamController {
 
 
                         }else{
-                            if(exam.QtoQTimeForAnyQ){
-                                if(!exam.timeForAnyQuestion){
-                                    value.ResponseTime = exam.questionTime
-        
-                                }
-                            }
+                        
                             if(req.files){
                                
                                let quesPic={
@@ -234,7 +179,8 @@ class ExamController {
                                   value.ques = ques
                                
 
-                            }else{
+                            }
+                            if(value.face){
                                 let face =value.face
                                 ques = {
                                     face
@@ -242,6 +188,11 @@ class ExamController {
                                 }
 
                             }
+                           
+                                
+                               
+
+                            
                             if(req.files){
                                 let answPic={
                                     url:process.cwd()+"/public/upload/"+req.files.answerPic[0].filename,
@@ -261,8 +212,21 @@ class ExamController {
 
 
                             }
+                            if(value.desc){
+                                let desc =value.desc
+                                answer = {
+                                    desc
+                                  
+                                }
+
+                            }
                             value.ques = ques
                             value.answer = answer
+
+                          
+
+
+
 
                             let questions = await questionModel.find({})
                             if(questions.length==0){
@@ -278,7 +242,7 @@ class ExamController {
                                       if (err) console.log(err)
 
                                       else{
-                                        return res.send({status:"success",message:"با موفقیت ایجاد شد",data:newQuestion})
+                                        return res.send({status:"success",message:"با موفقیت اضافه شد",data:newQuestion})
 
                                       }
                                     })
@@ -372,6 +336,59 @@ class ExamController {
             
            
            
+            
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+    static async createNewExamSheet(req, res) {
+        try {
+            const schema = joi.object().keys({
+                uniId: joi.number().required(), 
+                fullName: joi.string().required(),
+                password: joi.string().required(),
+                username: joi.string().required(),
+                email:   joi.string().custom(Helper.email, "email validation").required(),
+                role: joi.string().required(),
+
+                //id:Number,  
+                examId:Number,
+                //studentId:Number,
+                start_time:String,
+                //quesOrder:[Number],
+                //answers:[answerModel],
+                //currentQues:Number,
+                //remainingTime:String
+            })
+            const { error, value } = schema.validate(req.body, { abortEarly: true })
+            if (error) {
+                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید یا فرمت ایمیل  شما اشتباه است"})
+            }
+            examSheetModel
+
+
+            
+            
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+    static async getExamSheet(req, res) {
+        try {
+            
+            
+            
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+    
+    static async addAnswerToExamSheet(req, res) {
+        try {
+            
             
         } catch (error) {
             return res.send({status:"error",message:error})

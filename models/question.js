@@ -10,19 +10,20 @@ const mongoose = require('mongoose')
         url:String,
         name:String
       },
-      options:[String]
+      options:String,
+     
     },
     answer:{
       answPic:{
         url:String,
         name:String
       },
-      options:String
+      options:String,
+      desc:String
 
     },
-    ResponseTime:Number,
     Score: Number,
-    desc:String
+  
 
   });
 
