@@ -341,7 +341,15 @@ class ExamController {
                     for (let i = 0; i < exams.length; i++) {
                         for (let j = 0; j < courses.length; j++) {
                             if(exams[i].courseId==courses[j].id){
-                                list.push(exams[i])
+                                for (let k = 0; k < courses[j].studentIds.length; k++) {
+                                    if(courses[j].studentIds[k]==req.user.id){
+                                        list.push(exams[i])
+                                
+                                    } 
+                                    
+                                }
+                               
+                                
                             }
                            
                             
