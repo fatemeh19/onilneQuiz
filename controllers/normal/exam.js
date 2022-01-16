@@ -21,7 +21,6 @@ class ExamController {
                 courseId:joi.number().required(),
                 title:joi.string().required(),
                 testordesc:joi.boolean().required(), //0 test , 1 desc
-                questionType:joi.boolean().required(), //0 with prof , 1 pdf
                 review:joi.boolean().required(),
                 start_date:joi.string().required(),
                 start_time:joi.string().required(),
@@ -165,7 +164,7 @@ class ExamController {
 
                         }else{
                         
-                            if(req.files){
+                            if(req.files.questionPic){
                                
                                let quesPic={
                                     url:process.cwd()+"/public/upload/"+req.files.questionPic[0].filename,
@@ -193,7 +192,7 @@ class ExamController {
                                
 
                             
-                            if(req.files){
+                            if(req.files.answerPic){
                                 let answPic={
                                     url:process.cwd()+"/public/upload/"+req.files.answerPic[0].filename,
                                     name:req.files.answerPic[0].originalname

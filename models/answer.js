@@ -10,4 +10,5 @@ const mongoose = require('mongoose')
 
 const answerModel = mongoose.model('answers', answerSchema)
 module.exports.answerModel = answerModel
+module.exports.answerSchema = answerSchema
 

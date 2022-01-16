@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose;
-const {answerModel} = require('./answer')
+const {answerSchema} = require('./answer')
 
 
   const examSheetSchema = new Schema({
@@ -9,7 +9,7 @@ const {answerModel} = require('./answer')
     studentId:Number,
     start_time:String,
     quesOrder:[Number],
-    answers:[answerModel],
+    answers:[answerSchema],
     currentQues:Number,
     remainingTime:String
 
