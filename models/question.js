@@ -10,7 +10,7 @@ const mongoose = require('mongoose')
         url:String,
         name:String
       },
-      options:String,
+      options:[String],
      
     },
     answer:{
@@ -18,7 +18,7 @@ const mongoose = require('mongoose')
         url:String,
         name:String
       },
-      options:String,
+      options:Number,
       desc:String
 
     },

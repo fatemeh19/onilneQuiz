@@ -62,5 +62,6 @@ router.get('/exam/listForStu',ExamController.studentElist)
 
 router.post('/question/create',cpUpload,ExamController.addQuestion)
 
+router.post('/examSheet/create',cpUpload,ExamController.createNewExamSheet)
 
 module.exports = router;

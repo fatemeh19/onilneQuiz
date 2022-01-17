@@ -134,8 +134,8 @@ class ExamController {
                 face: joi.string(),
                 desc:joi.string(),
                 examId:joi.number().required(),
-                quesoptions:joi.string(),
-                answoptions:joi.string(), 
+                quesoptions:joi.array().items(joi.string()),
+                answoptions:joi.number(), 
                 Score: joi.number().required(),
               
                
@@ -344,17 +344,12 @@ class ExamController {
     static async createNewExamSheet(req, res) {
         try {
             const schema = joi.object().keys({
-                uniId: joi.number().required(), 
-                fullName: joi.string().required(),
-                password: joi.string().required(),
-                username: joi.string().required(),
-                email:   joi.string().custom(Helper.email, "email validation").required(),
-                role: joi.string().required(),
+                
 
                 //id:Number,  
-                examId:Number,
+                examId:joi.number().required(),
                 //studentId:Number,
-                start_time:String,
+                start_time: joi.string().required(),
                 //quesOrder:[Number],
                 //answers:[answerModel],
                 //currentQues:Number,
@@ -364,7 +359,81 @@ class ExamController {
             if (error) {
                 return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید یا فرمت ایمیل  شما اشتباه است"})
             }
-            examSheetModel
+
+            examModel.findOne({id:value.examId},(err,exam)=>{
+                if(exam){
+                examSheetModel.find({},(err,examSheets)=>{
+                    if(examSheets.length==0){
+                        value.id = 1
+    
+                    }else{
+                        value.id = examSheets[(examSheets.length)-1].id + 1
+    
+                    }
+                    let quesOrder = []
+    
+                    // exam.end_time 
+                    // console.log(exam.end_time)
+                    let dateSplitstart = value.start_time.split(":")
+                    let dateSplitend = exam.end_time.split(":")
+                    for (let index = 0; index < dateSplitstart.length; index++) {
+
+                        dateSplitstart[index]= parseInt(dateSplitstart[index])
+                        dateSplitend[index]= parseInt(dateSplitend[index])
+                    }
+                    console.log(dateSplitend[0])
+                    let totalmin = (dateSplitend[0]-dateSplitstart[0])*60+(dateSplitend[1]-dateSplitstart[1])
+                    let sec = dateSplitend[2]-dateSplitstart[2]
+                    if(sec<0){
+                        sec = 60+(sec)
+                        totalmin--
+                    }
+                    totalmin = totalmin + ':' + (sec)
+
+                    questionModel.find({
+                        examId:value.examId
+                    },(err,questions)=>{
+                        if(questions){
+                            for (let index = 0; index < questions.length; index++) {
+                                quesOrder.push(questions[index].id)
+                                
+                            }
+
+
+                            let newExamSheet = {
+                                id:value.id,  
+                                examId:value.examId,
+                                studentId:req.user.id,
+                                quesOrder:quesOrder,
+                                currentQues:quesOrder[0],
+                                remainingTime:totalmin
+                            }
+                            newExamSheet = new examSheetModel(newExamSheet)
+                            newExamSheet.save(function (err) {
+                            if (err) console.log(err)
+                            else{
+                                return res.send({status:"success",message:"با موفقیت وارد ازمون شدید",data:newExamSheet})
+
+
+                            }
+                            })
+                        }
+                    })
+
+                })
+                
+
+
+
+                    
+
+                
+                }
+
+
+
+            })
+            // examSheetModel
 
 
             
