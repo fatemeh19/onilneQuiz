@@ -509,7 +509,7 @@ class ExamController {
                 examId: joi.number().required(),
                 
             })
-            const { error, value } = schema.validate(req.body, { abortEarly: true })
+            const { error, value } = schema.validate(req.params, { abortEarly: true })
             if (error) {
                 return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید"})
             }
