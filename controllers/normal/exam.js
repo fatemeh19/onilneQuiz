@@ -334,17 +334,12 @@ class ExamController {
     }
     static async createNewExamSheet(req, res) {
         try {
+            
             const schema = joi.object().keys({
                 
-
-                //id:Number,  
                 examId:joi.number().required(),
-                //studentId:Number,
-                start_time: joi.string().required(),
-                //quesOrder:[Number],
-                //answers:[answerModel],
-                //currentQues:Number,
-                //remainingTime:String
+                // start_time: joi.string().required(),
+               
             })
             const { error, value } = schema.validate(req.body, { abortEarly: true })
             if (error) {
@@ -372,23 +367,46 @@ class ExamController {
             
                             }
                             let quesOrder = []
+                            let date = new persianDate(new Date())
+                          
+                       
             
                             // exam.end_time 
                             // console.log(exam.end_time)
-                            let dateSplitstart = value.start_time.split(":")
+                            let dateSplitCurrent = []
+                            dateSplitCurrent.push(date.algorithms.State.gregorian.hour)
+                            dateSplitCurrent.push(date.algorithms.State.gregorian.minute)
+                            dateSplitCurrent.push(date.algorithms.State.gregorian.second)
+                            let dateSplitstart = exam.start_time.split(":")
                             let dateSplitend = exam.end_time.split(":")
+
                             for (let index = 0; index < dateSplitstart.length; index++) {
         
                                 dateSplitstart[index]= parseInt(dateSplitstart[index])
                                 dateSplitend[index]= parseInt(dateSplitend[index])
                             }
-                            console.log(dateSplitend[0])
-                            let totalmin = (dateSplitend[0]-dateSplitstart[0])*60+(dateSplitend[1]-dateSplitstart[1])
-                            let sec = dateSplitend[2]-dateSplitstart[2]
+                            let startMins = dateSplitstart[0]*60+dateSplitstart[1]
+                            let currMins = dateSplitCurrent[0]*60+dateSplitCurrent[1]
+                            let endMins = dateSplitend[0]*60+dateSplitend[1]
+                            if(startMins<=currMins && currMins<=endMins){
+
+
+                                let hour = dateSplitend[0]-dateSplitCurrent[0]
+                            let min = dateSplitend[1]-dateSplitCurrent[1]
+                            if(min<0){
+                                min = 60+(min)
+                                hour--
+                
+
+                            }
+                            let totalmin = hour*60+min
+                            let sec = dateSplitend[2]-dateSplitCurrent[2]
                             if(sec<0){
                                 sec = 60+(sec)
                                 totalmin--
                             }
+                           
+                           
                             totalmin = totalmin + ':' + (sec)
         
                             questionModel.find({
@@ -421,6 +439,24 @@ class ExamController {
                                     })
                                 }
                             })
+
+
+                            }else{
+                               
+
+                                if(startMins>currMins){
+                                    return res.send({status:"error",message:"زمان آزمون هنوز آغاز نشده است"})
+
+
+                                }
+                                else if(currMins<endMins){
+                                    return res.send({status:"error",message:"زمان آزمون تمام شده است"})
+
+
+                                }
+
+                            }
+                            
         
                         })
                         
@@ -518,9 +554,6 @@ class ExamController {
             },(err,exam)=>{
                 if(exam){
             let date = new persianDate(new Date())
-            // console.log("date")
-
-            // console.log(date.algorithms.State.gregorian)
             let dateSplitCurrent = []
             let dateSplitend = exam.end_time.split(":")
             dateSplitCurrent.push(date.algorithms.State.gregorian.hour)
@@ -541,6 +574,7 @@ class ExamController {
                 totalmin--
             }
             totalmin = totalmin + ':' + (sec)
+            
             examSheetModel.findOne({
                 examId:value.examId,
                 studentId:value.studentId
@@ -548,6 +582,10 @@ class ExamController {
             },(err,examSheet)=>{
                 if(examSheet){
                     examSheet.remainingTime = totalmin
+                    if(totalmin<0){
+                        examSheet.status="Finished"
+                
+                    }
 
                     examSheet.save(function (err) {
                         if (err) console.log(err)
@@ -636,16 +674,15 @@ class ExamController {
         try {
             const schema = joi.object().keys({
                 examId:joi.number().required(),
-                studentId:joi.number().required()
                 
             })
-            const { error, value } = schema.validate(req.body, { abortEarly: true })
+            const { error, value } = schema.validate(req.params, { abortEarly: true })
             if (error) {
                 return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید"})
             }
             examSheetModel.findOne({
                 examId:value.examId,
-                studentId:value.studentId
+                studentId:req.user.id
 
             },(err,examSheet)=>{
                 if(examSheet){

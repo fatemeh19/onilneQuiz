@@ -68,5 +68,6 @@ router.get('/question/getByExId/:id',ExamController.getQuestionsOfExam)
 router.post('/examSheet/create',cpUpload,ExamController.createNewExamSheet)
 router.get('/examSheet/get/:examId/:studentId',ExamController.getExamSheet)
 router.put('/examSheet/update',ExamController.addAnswerToExamSheet)
+router.put('/examsheet/finish/:examId',ExamController.finishExam)
 
 module.exports = router;
