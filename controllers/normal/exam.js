@@ -388,6 +388,7 @@ class ExamController {
                             let startMins = dateSplitstart[0]*60+dateSplitstart[1]
                             let currMins = dateSplitCurrent[0]*60+dateSplitCurrent[1]
                             let endMins = dateSplitend[0]*60+dateSplitend[1]
+
                             if(startMins<=currMins && currMins<=endMins){
 
 
@@ -442,14 +443,14 @@ class ExamController {
 
 
                             }else{
-                               
+                                
 
                                 if(startMins>currMins){
                                     return res.send({status:"error",message:"زمان آزمون هنوز آغاز نشده است"})
 
 
                                 }
-                                else if(currMins<endMins){
+                                else if(currMins>endMins){
                                     return res.send({status:"error",message:"زمان آزمون تمام شده است"})
 
 
@@ -467,6 +468,7 @@ class ExamController {
         
                         
                         }
+                       
         
         
         
@@ -637,15 +639,34 @@ class ExamController {
 
             },(err,examSheet)=>{
                 if(examSheet){
+                   
+
+
                     let answer = {
                         ResponseTest : value.ResponseTest,
                         ResponseDesc : value.ResponseDesc,
                         questionId : value.questionId,
         
                     }
-                    let newAnswer = new answerModel(answer)
 
-                    examSheet.answers.push(newAnswer)
+                    let New = true
+                    let newAnswer = new answerModel(answer)
+                    
+                    for (let index = 0; index < examSheet.answers.length; index++) {
+                        if(examSheet.answers[index].questionId==answer.questionId){
+                            examSheet.answers[index] = newAnswer
+                            New = false
+                            
+                        }
+                        
+                    }
+                    if(New){
+                        
+                        examSheet.answers.push(newAnswer)
+
+                    }
+
+                    
                     examSheet.save(function (err) {
                         if (err) console.log(err)
                         else{
