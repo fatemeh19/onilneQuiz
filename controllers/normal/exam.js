@@ -3,6 +3,7 @@ const {examModel} = require('../../models/exam')
 const {questionModel} = require('../../models/question')
 const {courseModel} = require('../../models/course')
 const {examSheetModel} = require('../../models/examSheet')
+const {answerModel} = require('../../models/answer')
 
 
 // const response = require('../../middleware/responseHandler')
@@ -170,21 +171,15 @@ class ExamController {
                                     url:process.cwd()+"/public/upload/"+req.files.questionPic[0].filename,
                                     name:req.files.questionPic[0].originalname
                                   }
-                                  ques = {
-                                    quesPic
-                                  
-                                }
-                                //   ques.quesPic = quesPic
+                                
+                                  ques.quesPic = quesPic
                                   value.ques = ques
                                
 
                             }
                             if(value.face){
                                 let face =value.face
-                                ques = {
-                                    face
-                                  
-                                }
+                                ques.face = face
 
                             }
                            
@@ -197,10 +192,9 @@ class ExamController {
                                     url:process.cwd()+"/public/upload/"+req.files.answerPic[0].filename,
                                     name:req.files.answerPic[0].originalname
                                   }
-                                  answer = {
-                                    answPic
                                   
-                                }
+                                  
+                                
                                   answer.answPic = answPic
                                
 
@@ -213,10 +207,7 @@ class ExamController {
                             }
                             if(value.desc){
                                 let desc =value.desc
-                                answer = {
-                                    desc
-                                  
-                                }
+                                answer.desc =desc
 
                             }
                             value.ques = ques
@@ -357,7 +348,7 @@ class ExamController {
             })
             const { error, value } = schema.validate(req.body, { abortEarly: true })
             if (error) {
-                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید یا فرمت ایمیل  شما اشتباه است"})
+                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید"})
             }
 
             examModel.findOne({id:value.examId},(err,exam)=>{
@@ -443,8 +434,126 @@ class ExamController {
         }
 
     }
+    static async getExam(req, res) {
+        try {
+            examModel.findOne({
+                id:req.params.id
+            },(err,exam)=>{
+                if(exam){
+                    return res.send({status:"success",message:"با موفقیت انجام شد",data:exam})
+
+                }else{
+                    return res.send({status:"error",message:"آزمون مورد نظر شما وجود ندارد"})
+
+
+                }
+
+            })
+            
+            
+            
+            
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+
+    static async getQuestionsOfExam(req, res) {
+        try {
+            questionModel.find({
+                examId:req.params.id
+            },(err,questions)=>{
+                if(questions){
+                    return res.send({status:"success",message:"با موفقیت انجام شد",data:questions})
+
+                }else{
+                    return res.send({status:"error",message:"آزمون مورد نظر شما وجود ندارد"})
+
+
+                }
+
+            })
+            
+            
+            
+            
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+
+    
     static async getExamSheet(req, res) {
         try {
+            const schema = joi.object().keys({
+           
+                studentId:joi.number().required(),
+                examId: joi.number().required(),
+                
+            })
+            const { error, value } = schema.validate(req.body, { abortEarly: true })
+            if (error) {
+                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید"})
+            }
+            examModel.findOne({
+                id:value.examId
+            },(err,exam)=>{
+                if(exam){
+            let date = new persianDate(new Date())
+            // console.log("date")
+
+            // console.log(date.algorithms.State.gregorian)
+            let dateSplitCurrent = []
+            let dateSplitend = exam.end_time.split(":")
+            dateSplitCurrent.push(date.algorithms.State.gregorian.hour)
+            dateSplitCurrent.push(date.algorithms.State.gregorian.minute)
+            dateSplitCurrent.push(date.algorithms.State.gregorian.second)
+            for (let index = 0; index < dateSplitend.length; index++) {
+
+                dateSplitend[index]= parseInt(dateSplitend[index])
+            }
+
+
+
+                    
+            let totalmin = (dateSplitend[0]-dateSplitCurrent[0])*60+(dateSplitend[1]-dateSplitCurrent[1])
+            let sec = dateSplitend[2]-dateSplitCurrent[2]
+            if(sec<0){
+                sec = 60+(sec)
+                totalmin--
+            }
+            totalmin = totalmin + ':' + (sec)
+            examSheetModel.findOne({
+                examId:value.examId,
+                studentId:value.studentId
+
+            },(err,examSheet)=>{
+                if(examSheet){
+                    examSheet.remainingTime = totalmin
+
+                    examSheet.save(function (err) {
+                        if (err) console.log(err)
+                        else{
+                            return res.send({status:"success",message:"با موفقیت انجام شد",data:examSheet})
+
+
+
+                        }
+                        })
+
+                
+
+
+                }
+            })
+
+
+                }
+            })
+            
+            
             
             
             
@@ -456,6 +565,49 @@ class ExamController {
     
     static async addAnswerToExamSheet(req, res) {
         try {
+            const schema = joi.object().keys({
+                questionId:joi.number().required(),
+                ResponseTest:joi.number(),
+                ResponseDesc:joi.string(),
+                examId:joi.number().required(),
+                studentId:joi.number().required()
+                
+            })
+            const { error, value } = schema.validate(req.body, { abortEarly: true })
+            if (error) {
+                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید"})
+            }
+            examSheetModel.findOne({
+                examId:value.examId,
+                studentId:value.studentId
+
+            },(err,examSheet)=>{
+                if(examSheet){
+                    let answer = {
+                        ResponseTest : value.ResponseTest,
+                        ResponseDesc : value.ResponseDesc,
+                        questionId : value.questionId,
+        
+                    }
+                    let newAnswer = new answerModel(answer)
+
+                    examSheet.answers.push(newAnswer)
+                    examSheet.save(function (err) {
+                        if (err) console.log(err)
+                        else{
+                            return res.send({status:"success",message:"پاسخ با موفقیت ثبت شد",data:examSheet})
+
+
+                        }
+                        })
+                    
+                    
+        
+
+                }
+            })
+            
+            
             
             
         } catch (error) {

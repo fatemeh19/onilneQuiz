@@ -57,11 +57,16 @@ router.get('/course/ListOfProffCourses',CourseController.ListOfProffCourses)
 router.post('/exam/create',cpUpload,ExamController.Create)
 router.get('/exam/listForProf',ExamController.List)
 router.get('/exam/listForStu',ExamController.studentElist)
+router.get('/exam/getById/:id',ExamController.getExam)
 
 
 
 router.post('/question/create',cpUpload,ExamController.addQuestion)
+router.get('/question/getByExId/:id',ExamController.getQuestionsOfExam)
+
 
 router.post('/examSheet/create',cpUpload,ExamController.createNewExamSheet)
+router.get('/examSheet/get',ExamController.getExamSheet)
+router.put('/examSheet/update',ExamController.addAnswerToExamSheet)
 
 module.exports = router;

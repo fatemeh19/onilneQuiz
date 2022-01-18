@@ -3,8 +3,8 @@ const mongoose = require('mongoose')
 
   const answerSchema = new Schema({
     questionId:Number,
-    Response:Number
-    
+    ResponseTest:Number,
+    ResponseDesc:String
 
   });
 
