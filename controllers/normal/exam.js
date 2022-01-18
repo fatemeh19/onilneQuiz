@@ -350,80 +350,96 @@ class ExamController {
             if (error) {
                 return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید"})
             }
+            examSheetModel.findOne({
+                studentId:req.user.id,
+                examId:value.examId
 
-            examModel.findOne({id:value.examId},(err,exam)=>{
-                if(exam){
-                examSheetModel.find({},(err,examSheets)=>{
-                    if(examSheets.length==0){
-                        value.id = 1
-    
-                    }else{
-                        value.id = examSheets[(examSheets.length)-1].id + 1
-    
-                    }
-                    let quesOrder = []
-    
-                    // exam.end_time 
-                    // console.log(exam.end_time)
-                    let dateSplitstart = value.start_time.split(":")
-                    let dateSplitend = exam.end_time.split(":")
-                    for (let index = 0; index < dateSplitstart.length; index++) {
+            },(err,examSheet)=>{
+                if(examSheet){
+                    return res.send({status:"error",message:"شما در این ازمون شرکت کرده اید"})
 
-                        dateSplitstart[index]= parseInt(dateSplitstart[index])
-                        dateSplitend[index]= parseInt(dateSplitend[index])
-                    }
-                    console.log(dateSplitend[0])
-                    let totalmin = (dateSplitend[0]-dateSplitstart[0])*60+(dateSplitend[1]-dateSplitstart[1])
-                    let sec = dateSplitend[2]-dateSplitstart[2]
-                    if(sec<0){
-                        sec = 60+(sec)
-                        totalmin--
-                    }
-                    totalmin = totalmin + ':' + (sec)
 
-                    questionModel.find({
-                        examId:value.examId
-                    },(err,questions)=>{
-                        if(questions){
-                            for (let index = 0; index < questions.length; index++) {
-                                quesOrder.push(questions[index].id)
-                                
+                }else{
+                    examModel.findOne({id:value.examId},(err,exam)=>{
+                        if(exam){
+                            
+                        examSheetModel.find({},(err,examSheets)=>{
+                            if(examSheets.length==0){
+                                value.id = 1
+            
+                            }else{
+                                value.id = examSheets[(examSheets.length)-1].id + 1
+            
                             }
-
-
-                            let newExamSheet = {
-                                id:value.id,  
-                                examId:value.examId,
-                                studentId:req.user.id,
-                                quesOrder:quesOrder,
-                                currentQues:quesOrder[0],
-                                remainingTime:totalmin
+                            let quesOrder = []
+            
+                            // exam.end_time 
+                            // console.log(exam.end_time)
+                            let dateSplitstart = value.start_time.split(":")
+                            let dateSplitend = exam.end_time.split(":")
+                            for (let index = 0; index < dateSplitstart.length; index++) {
+        
+                                dateSplitstart[index]= parseInt(dateSplitstart[index])
+                                dateSplitend[index]= parseInt(dateSplitend[index])
                             }
-                            newExamSheet = new examSheetModel(newExamSheet)
-                            newExamSheet.save(function (err) {
-                            if (err) console.log(err)
-                            else{
-                                return res.send({status:"success",message:"با موفقیت وارد ازمون شدید",data:newExamSheet})
-
-
+                            console.log(dateSplitend[0])
+                            let totalmin = (dateSplitend[0]-dateSplitstart[0])*60+(dateSplitend[1]-dateSplitstart[1])
+                            let sec = dateSplitend[2]-dateSplitstart[2]
+                            if(sec<0){
+                                sec = 60+(sec)
+                                totalmin--
                             }
+                            totalmin = totalmin + ':' + (sec)
+        
+                            questionModel.find({
+                                examId:value.examId
+                            },(err,questions)=>{
+                                if(questions){
+                                    for (let index = 0; index < questions.length; index++) {
+                                        quesOrder.push(questions[index].id)
+                                        
+                                    }
+        
+        
+                                    let newExamSheet = {
+                                        id:value.id,  
+                                        examId:value.examId,
+                                        studentId:req.user.id,
+                                        quesOrder:quesOrder,
+                                        currentQues:quesOrder[0],
+                                        remainingTime:totalmin,
+                                        status:"not Finished"
+                                    }
+                                    newExamSheet = new examSheetModel(newExamSheet)
+                                    newExamSheet.save(function (err) {
+                                    if (err) console.log(err)
+                                    else{
+                                        return res.send({status:"success",message:"با موفقیت وارد ازمون شدید",data:newExamSheet})
+        
+        
+                                    }
+                                    })
+                                }
                             })
+        
+                        })
+                        
+        
+        
+        
+                            
+        
+                        
                         }
+        
+        
+        
                     })
 
-                })
-                
-
-
-
-                    
-
-                
                 }
-
-
-
             })
+
+            
             // examSheetModel
 
 
@@ -570,7 +586,7 @@ class ExamController {
                 ResponseTest:joi.number(),
                 ResponseDesc:joi.string(),
                 examId:joi.number().required(),
-                studentId:joi.number().required()
+               
                 
             })
             const { error, value } = schema.validate(req.body, { abortEarly: true })
@@ -579,7 +595,7 @@ class ExamController {
             }
             examSheetModel.findOne({
                 examId:value.examId,
-                studentId:value.studentId
+                studentId:req.user.id
 
             },(err,examSheet)=>{
                 if(examSheet){
@@ -596,6 +612,49 @@ class ExamController {
                         if (err) console.log(err)
                         else{
                             return res.send({status:"success",message:"پاسخ با موفقیت ثبت شد",data:examSheet})
+
+
+                        }
+                        })
+                    
+                    
+        
+
+                }
+            })
+            
+            
+            
+            
+        } catch (error) {
+            return res.send({status:"error",message:error})
+        }
+
+    }
+
+    static async finishExam(req, res) {
+        try {
+            const schema = joi.object().keys({
+                examId:joi.number().required(),
+                studentId:joi.number().required()
+                
+            })
+            const { error, value } = schema.validate(req.body, { abortEarly: true })
+            if (error) {
+                return res.send({status:"error",message:" یکی از فیلد های ضروری را پر نکرده اید"})
+            }
+            examSheetModel.findOne({
+                examId:value.examId,
+                studentId:value.studentId
+
+            },(err,examSheet)=>{
+                if(examSheet){
+                    
+                    examSheet.status ="Finished"
+                    examSheet.save(function (err) {
+                        if (err) console.log(err)
+                        else{
+                            return res.send({status:"success",message:"آزمون شما به پایان رسید"})
 
 
                         }

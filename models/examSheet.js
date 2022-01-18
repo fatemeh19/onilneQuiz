@@ -11,7 +11,9 @@ const {answerSchema} = require('./answer')
     quesOrder:[Number],
     answers:[answerSchema],
     currentQues:Number,
-    remainingTime:String
+    remainingTime:String,
+    status:String, //Finished or not Finished
+   
 
     
   });

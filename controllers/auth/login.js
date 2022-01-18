@@ -157,6 +157,8 @@ class AuthController {
                 if (error) {
                     console.log(error);
                 } else {
+                    return res.send({status:"success",message:" ایمیل با موفقیت ارسال شد"})
+
                     console.log('Email sent: ' + info.response)
                 }
                 })
