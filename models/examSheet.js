@@ -13,7 +13,7 @@ const {answerSchema} = require('./answer')
     currentQues:Number,
     remainingTime:String,
     status:String, //Finished or not Finished
-   
+    finalScore:Number
 
     
   });

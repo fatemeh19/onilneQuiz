@@ -4,7 +4,11 @@ const mongoose = require('mongoose')
   const answerSchema = new Schema({
     questionId:Number,
     ResponseTest:Number,
-    ResponseDesc:String
+    ResponseDesc:String,
+    grade:{ 
+      type:Number,
+      default:0
+    }
 
   });
 

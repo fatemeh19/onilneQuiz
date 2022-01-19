@@ -555,6 +555,9 @@ class ExamController {
                 id:value.examId
             },(err,exam)=>{
                 if(exam){
+                    
+                    
+
             let date = new persianDate(new Date())
             let dateSplitCurrent = []
             let dateSplitend = exam.end_time.split(":")
@@ -565,17 +568,26 @@ class ExamController {
 
                 dateSplitend[index]= parseInt(dateSplitend[index])
             }
+            let hour = dateSplitend[0]-dateSplitCurrent[0]
+            let min = dateSplitend[1]-dateSplitCurrent[1]
+            if(min<0){
+                min = 60+(min)
+                hour--
 
 
-
-                    
-            let totalmin = (dateSplitend[0]-dateSplitCurrent[0])*60+(dateSplitend[1]-dateSplitCurrent[1])
+            }
+            let totalmin = hour*60+min
             let sec = dateSplitend[2]-dateSplitCurrent[2]
             if(sec<0){
                 sec = 60+(sec)
                 totalmin--
             }
-            totalmin = totalmin + ':' + (sec)
+            
+            
+            let totalmin1 = totalmin + ':' + (sec)
+
+
+
             
             examSheetModel.findOne({
                 examId:value.examId,
@@ -583,11 +595,41 @@ class ExamController {
 
             },(err,examSheet)=>{
                 if(examSheet){
-                    examSheet.remainingTime = totalmin
+                    examSheet.remainingTime = totalmin1
                     if(totalmin<0){
                         examSheet.status="Finished"
+
+                        if(!(exam.testordesc)){
+                            let finalScore=0
+                            questionModel.find({
+                                examId:exam.id
+                            },(err,questions)=>{
+                                if(questions){
+                                    console.log(questions.length)
+                                    for (let i = 0; i < examSheet.answers.length; i++) {
+                                        for (let j = 0; j < questions.length; j++) {
+                                            if(examSheet.answers[i].questionId==questions[j].id){
+                                               
+                                                if(examSheet.answers[i].ResponseTest==questions[j].answer.options){
+                                                    examSheet.answers[i].grade = questions[j].Score
+                                                    finalScore = finalScore + questions[j].Score
+                                                }
+                                            }
+                                            
+                                        }
+                                        
+                                    }
+                                    examSheet.finalScore = finalScore
+
+                                     
+                                }
+                            })
+                        }
+                        
                 
                     }
+                    
+                    
 
                     examSheet.save(function (err) {
                         if (err) console.log(err)
@@ -602,8 +644,16 @@ class ExamController {
                 
 
 
+                }else{
+                    return res.send({status:"error",message:"پاسخنامه مد نظر شما موجود نیست"})
+
+
                 }
             })
+
+
+                }else{
+                    return res.send({status:"error",message:"آزمون مد نظر شما موجود نیست"})
 
 
                 }
@@ -661,7 +711,7 @@ class ExamController {
                         
                     }
                     if(New){
-                        
+
                         examSheet.answers.push(newAnswer)
 
                     }
